@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ToDoApp.data;
+using ToDoApp.Data.IRepos;
+using ToDoApp.Data.Repos;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,9 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services
+    .AddScoped<IUserRepo, UserRepo>()
+    .AddScoped<ITaskItemRepo, TaskItemRepo>();
 
 var app = builder.Build();
 
