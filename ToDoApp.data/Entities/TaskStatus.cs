@@ -15,6 +15,6 @@ namespace ToDoApp.Data.Entities
     public class TaskStatus
     {
         public int Id { get; set; }
-        public Status Status { get; set; }
+        public virtual Status Status { get; set; }
     }
 }

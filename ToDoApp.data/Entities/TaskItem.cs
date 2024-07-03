@@ -13,8 +13,8 @@ namespace ToDoApp.Data.Entities
         public string Description { get; set; }
         public DateTime AddedOnUtc { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
+        public virtual User User { get; set; }
         public int TaskStatusId { get; set; }
-        public TaskStatus TaskStatus { get; set; }
+        public virtual TaskStatus TaskStatus { get; set; }
     }
 }
