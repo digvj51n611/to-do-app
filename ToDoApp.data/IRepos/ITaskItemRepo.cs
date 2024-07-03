@@ -11,8 +11,8 @@ namespace ToDoApp.Data.IRepos
     {
         public Task<TaskItem> GetTaskItemAsync(int id);
         public Task<List<TaskItem>> GetTaskItemsAsync();
-        public Task<bool> AddTaskItemAsync(TaskItem taskItem);
-        public Task<bool> UpdateTaskItemAsync(TaskItem taskItem);
-        public Task<bool> DeleteTaskItemAsync(int id);
+        public Task<TaskItem> AddTaskItemAsync(TaskItem taskItem);
+        public Task<TaskItem> UpdateTaskItemAsync(TaskItem taskItem);
+        public Task<TaskItem> DeleteTaskItemAsync(int id);
     }
 }

@@ -1,13 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.TagHelpers;
+﻿
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
-using Microsoft.Identity.Client;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 using ToDoApp.data;
 using ToDoApp.Data.Entities;
 using ToDoApp.Data.IRepos;
@@ -51,7 +43,7 @@ namespace ToDoApp.Data.Repos
                 }
             }
         }
-        public async Task<bool> AddTaskItemAsync(TaskItem taskItem)
+        public async Task<TaskItem> AddTaskItemAsync(TaskItem taskItem)
         {
             using (var context = _context)
             {
@@ -61,7 +53,7 @@ namespace ToDoApp.Data.Repos
                     try
                     {
                         if(await context.SaveChangesAsync() > 0 )
-                        return true;
+                        return taskItem;
                         throw new Exception("Save changes failed");
                     }
                     catch( Exception ex )
@@ -76,7 +68,7 @@ namespace ToDoApp.Data.Repos
                 }
             }
         }
-        public async Task<bool> UpdateTaskItemAsync(TaskItem taskItem)
+        public async Task<TaskItem> UpdateTaskItemAsync(TaskItem taskItem)
         {
             using( var context = _context)
             {
@@ -87,7 +79,7 @@ namespace ToDoApp.Data.Repos
                     task.Title = taskItem.Title;
                     task.Description = taskItem.Description;
                     task.TaskStatus = taskItem.TaskStatus;
-                    if (await context.SaveChangesAsync() > 0) return true;
+                    if (await context.SaveChangesAsync() > 0) return task;
                     throw new Exception("Update Failed");
                     
                 }
@@ -97,7 +89,7 @@ namespace ToDoApp.Data.Repos
                 }
             }
         }
-        public async Task<bool> DeleteTaskItemAsync(int id)
+        public async Task<TaskItem> DeleteTaskItemAsync(int id)
         {
             using(var context = _context)
             {
@@ -105,7 +97,7 @@ namespace ToDoApp.Data.Repos
                 {
                     var task = await GetTaskItemAsync(id);
                     context.Remove(task);
-                    if(await context.SaveChangesAsync() > 0 ) return true;
+                    if(await context.SaveChangesAsync() > 0 ) return task;
                     throw new Exception("Deletion Failed!");
                 }
                 catch

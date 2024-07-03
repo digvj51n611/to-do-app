@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using ToDoApp.data;
 using ToDoApp.Data.Entities;
+using ToDoApp.Data.IRepos;
 
 namespace ToDoApp.Data.Repos
 {
-    public class UserRepo
+    public class UserRepo : IUserRepo
     {
         private ToDoDbContext _context;
         public UserRepo(ToDoDbContext context)
