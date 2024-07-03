@@ -1,7 +1,11 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ToDoApp.data;
 using ToDoApp.Data.IRepos;
 using ToDoApp.Data.Repos;
+using ToDoApp.Data.Validators;
+using ToDoApp.Service.Mappers;
+using ToDoApp.Service.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,14 +15,13 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddDbContext<ToDoDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
+builder.Services.AddAutoMapper(config => config.AddProfile<MappingProfile>());
+builder.Services.AddDbContext<ToDoDbContext>();
 builder.Services
     .AddScoped<IUserRepo, UserRepo>()
-    .AddScoped<ITaskItemRepo, TaskItemRepo>();
-
+    .AddScoped<ITaskItemRepo, TaskItemRepo>()
+    .AddScoped<IValidator<TaskDto>,TaskDtoValidator>()
+    .AddScoped<IValidator<UserDto>,UserDtoValidator>();
 var app = builder.Build();
 
 app.UseDefaultFiles();
