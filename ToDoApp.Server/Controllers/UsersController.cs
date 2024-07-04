@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ToDoApp.Data.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
 using ToDoApp.data;
+using ToDoApp.Service.Models;
+using ToDoApp.Service.IServices;
 
 namespace ToDoApp.Server.Controllers
 {
@@ -15,94 +10,103 @@ namespace ToDoApp.Server.Controllers
     public class UsersController : ControllerBase
     {
         private readonly ToDoDbContext _context;
-
-        public UsersController(ToDoDbContext context)
+        private readonly IUserService _userService;
+        public UsersController(ToDoDbContext context,IUserService service)
         {
             _context = context;
+            _userService = service;
+        }
+        private ActionResult<T> ResultFromCode<T>(ErrorCode code, Exception ex)
+        {
+            if (code == ErrorCode.NotFoundError) return NotFound(ex.Message);
+            if (code == ErrorCode.AuthenticationError) return Unauthorized("Unauthorized");
+            if (code == ErrorCode.ValidationError) return BadRequest("Validation Errors:\n" + ex.Message);
+            return Problem(
+                detail: ex.Message,
+                statusCode: StatusCodes.Status500InternalServerError,
+                title: "An unexpected error occurred.");
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetUsers()
+        public async Task<ActionResult<IEnumerable<UserDto>>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            var serviceResult = await _userService.GetUsersServiceAsync();
+            if (serviceResult.IsSuccess)
+            {
+                return Ok(serviceResult.Result);
+            }
+            else
+            {
+                return ResultFromCode<IEnumerable<UserDto>>(serviceResult.ErrorCode, serviceResult.Exception!);
+            }
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-
-            if (user == null)
+            var serviceResult = await _userService.GetUserServiceAsync(id);
+            if (serviceResult.IsSuccess)
             {
-                return NotFound();
+                return Ok(serviceResult.Result);
             }
-
-            return user;
+            else
+            {
+                return ResultFromCode<UserDto>(serviceResult.ErrorCode, serviceResult.Exception!);
+            }
         }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
+        public async Task<ActionResult<UserDto>> PutUser(UserDto userDto)
         {
-            if (id != user.Id)
+            var serviceResult = await _userService.UpdateUserServiceAsync(userDto);
+            if (serviceResult.IsSuccess)
             {
-                return BadRequest();
+                return Ok(serviceResult.Result);
             }
-
-            _context.Entry(user).State = EntityState.Modified;
-
-            try
+            else
             {
-                await _context.SaveChangesAsync();
+                return ResultFromCode<UserDto>(serviceResult.ErrorCode, serviceResult.Exception!);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
         }
 
-        // POST: api/Users
+        // POST: api/Users/register
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost("/register")]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+            var serviceResult = await _userService.AddUserServiceAsync(userDto);
+            if (serviceResult.IsSuccess)
+            {
+                return Ok(serviceResult.Result);
+            }
+            else
+            {
+                return ResultFromCode<UserDto>(serviceResult.ErrorCode, serviceResult.Exception!);
+            }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<ActionResult<UserDto>> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var serviceResult = await _userService.DeleteUserServiceAsync(id);
+            if (serviceResult.IsSuccess)
             {
-                return NotFound();
+                return Ok(serviceResult.Result);
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            else
+            {
+                return ResultFromCode<UserDto>(serviceResult.ErrorCode, serviceResult.Exception!);
+            }
         }
 
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
+        //private bool UserExists(int id)
+        //{
+        //    return _context.Users.Any(e => e.Id == id);
+        //}
     }
 }
