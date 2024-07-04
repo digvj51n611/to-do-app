@@ -12,11 +12,13 @@ using ToDoApp.Service.IServices;
 using ToDoApp.Service.Models;
 using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ToDoApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TasksController : ControllerBase
     {
         private readonly ITaskItemService _taskService;

@@ -3,11 +3,13 @@ using ToDoApp.data;
 using ToDoApp.Service.Models;
 using ToDoApp.Service.IServices;
 using System.Configuration;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ToDoApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly ToDoDbContext _context;
@@ -45,10 +47,10 @@ namespace ToDoApp.Server.Controllers
         }
 
         // GET: api/Users/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<UserDto>> GetUser(int id)
+        [HttpGet("{username}")]
+        public async Task<ActionResult<UserDto>> GetUser(string username)
         {
-            var serviceResult = await _userService.GetUserServiceAsync(id);
+            var serviceResult = await _userService.GetUserServiceAsync(username);
             if (serviceResult.IsSuccess)
             {
                 return Ok(serviceResult.Result);
@@ -90,12 +92,12 @@ namespace ToDoApp.Server.Controllers
                 return ResultFromCode<UserDto>(serviceResult.ErrorCode, serviceResult.Exception!);
             }
         }
-
+        
         // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<UserDto>> DeleteUser(int id)
+        [HttpDelete("{username}")]
+        public async Task<ActionResult<UserDto>> DeleteUser(string username)
         {
-            var serviceResult = await _userService.DeleteUserServiceAsync(id);
+            var serviceResult = await _userService.DeleteUserServiceAsync(username);
             if (serviceResult.IsSuccess)
             {
                 return Ok(serviceResult.Result);

@@ -17,14 +17,14 @@ namespace ToDoApp.Data.Repos
         {
             _context = context;
         }
-        public async Task<User> GetUserAsync(int id)
+        public async Task<User> GetUserAsync(string username)
         {
             using (var context = _context)
             {
                 try
                 {
-                    var user = await context.Users.FindAsync(id);
-                    if (user == null) throw new Exception("Not Found");
+                    var user = await context.Users.FirstOrDefaultAsync(user => user.Username == username);
+                    if (user == null) throw new Exception("NotFoundError");
                     return user;
                 }
                 catch (Exception ex)
@@ -47,7 +47,7 @@ namespace ToDoApp.Data.Repos
                 }
             }
         }
-        public async Task<bool> AddUserAsync(User user)
+        public async Task<User> AddUserAsync(User user)
         {
             using (var context = _context)
             {
@@ -57,7 +57,9 @@ namespace ToDoApp.Data.Repos
                     try
                     {
                         if (await context.SaveChangesAsync() > 0)
-                            return true;
+                        {
+                            return context.Users.FirstOrDefault(userData => userData.Username == user.Username)!;
+                        }
                         throw new Exception("Save changes failed");
                     }
                     catch (Exception ex)
@@ -68,20 +70,24 @@ namespace ToDoApp.Data.Repos
                 }
                 catch
                 {
+                    Console.WriteLine("Something wrong Babe");
                     throw;
                 }
             }
         }
-        public async Task<bool> UpdateUserAsync(User user)
+        public async Task<User> UpdateUserAsync(User user)
         {
             using (var context = _context)
             {
                 try
                 {
-                    var oldUser = await GetUserAsync(user.Id);
+                    var oldUser = await GetUserAsync(user.Username);
                     oldUser.Username = user.Username;
                     oldUser.Password = user.Password;
-                    if (await context.SaveChangesAsync() > 0) return true;
+                    if (await context.SaveChangesAsync() > 0)
+                    {
+                        return context.Users.FirstOrDefault(user => user.Username == oldUser.Username)!;
+                    }
                     throw new Exception("User Update Failed");
                 }
                 catch (Exception ex)
@@ -90,15 +96,18 @@ namespace ToDoApp.Data.Repos
                 }
             }
         }
-        public async Task<bool> DeleteUserAsync(int id)
+        public async Task<User> DeleteUserAsync(string username)
         {
             using (var context = _context)
             {
                 try
                 {
-                    var user = await GetUserAsync(id);
+                    var user = await GetUserAsync(username);
                     context.Remove(user);
-                    if (await context.SaveChangesAsync() > 0) return true;
+                    if (await context.SaveChangesAsync() > 0)
+                    {
+                        return user;
+                    }
                     throw new Exception("User Deletion Failed!");
                 }
                 catch

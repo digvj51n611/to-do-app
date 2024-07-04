@@ -25,7 +25,7 @@ namespace ToDoApp.Data.Repos
                 }
                 catch (Exception ex)
                 {
-                    throw;
+                    throw new Exception("SERVER_ERR");
                 }
             }
         }
@@ -39,7 +39,7 @@ namespace ToDoApp.Data.Repos
                 }
                 catch(Exception ex)
                 {
-                    throw;
+                    throw new Exception("SERVER_ERR");
                 }
             }
         }

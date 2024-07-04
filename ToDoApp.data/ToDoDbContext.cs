@@ -9,17 +9,16 @@ namespace ToDoApp.data
         public virtual DbSet<TaskItem> Tasks { get; set; }
         public virtual DbSet<User> Users { get; set;}
         public virtual DbSet<Data.Entities.TaskStatus> TaskStatuses { get; set; }
-        public ToDoDbContext()
-        {
-
-        }
-        //public ToDoDbContext(DbContextOptions<ToDoDbContext> options) : base(options)
+        //public ToDoDbContext()
         //{
 
         //}
+        public ToDoDbContext(DbContextOptions<ToDoDbContext> options) : base(options)
+        {
+
+        }
         protected override void OnConfiguring( DbContextOptionsBuilder builder )
         {
-            //builder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=ToDoDb;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
             base.OnConfiguring(builder);
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
