@@ -4,8 +4,10 @@ using ToDoApp.data;
 using ToDoApp.Data.IRepos;
 using ToDoApp.Data.Repos;
 using ToDoApp.Data.Validators;
+using ToDoApp.Service.IServices;
 using ToDoApp.Service.Mappers;
 using ToDoApp.Service.Models;
+using ToDoApp.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,12 +18,18 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(config => config.AddProfile<MappingProfile>());
-builder.Services.AddDbContext<ToDoDbContext>();
+builder.Services.AddDbContext<ToDoDbContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+builder.Services.AddHttpContextAccessor();
 builder.Services
     .AddScoped<IUserRepo, UserRepo>()
     .AddScoped<ITaskItemRepo, TaskItemRepo>()
-    .AddScoped<IValidator<TaskDto>,TaskDtoValidator>()
-    .AddScoped<IValidator<UserDto>,UserDtoValidator>();
+    .AddScoped<IValidator<TaskDto>, TaskDtoValidator>()
+    .AddScoped<IValidator<UserDto>, UserDtoValidator>()
+    .AddScoped<IUserService, UserService>()
+    .AddScoped<ITaskItemService, TaskItemService>();
 var app = builder.Build();
 
 app.UseDefaultFiles();

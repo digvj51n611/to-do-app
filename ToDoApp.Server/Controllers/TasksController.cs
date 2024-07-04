@@ -25,7 +25,7 @@ namespace ToDoApp.Server.Controllers
         {
             _taskService = service;
         }
-        private ActionResult<T> ResultFromCode<T>(ErrorCode code,Exception ex)
+        private ActionResult<T> ResultFromCode<T>(ErrorCode? code,Exception ex)
         {
             if(code == ErrorCode.NotFoundError) return NotFound(ex.Message);
             if(code == ErrorCode.AuthenticationError) return Unauthorized("Unauthorized");

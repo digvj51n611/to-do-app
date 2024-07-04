@@ -2,6 +2,7 @@
 using ToDoApp.data;
 using ToDoApp.Service.Models;
 using ToDoApp.Service.IServices;
+using System.Configuration;
 
 namespace ToDoApp.Server.Controllers
 {
@@ -16,11 +17,12 @@ namespace ToDoApp.Server.Controllers
             _context = context;
             _userService = service;
         }
-        private ActionResult<T> ResultFromCode<T>(ErrorCode code, Exception ex)
+        private ActionResult<T> ResultFromCode<T>(ErrorCode? code, Exception ex)
         {
-            if (code == ErrorCode.NotFoundError) return NotFound(ex.Message);
+            Console.WriteLine(code);
+            if (code == ErrorCode.NotFoundError) return NotFound( new { error = ex.Message});
             if (code == ErrorCode.AuthenticationError) return Unauthorized("Unauthorized");
-            if (code == ErrorCode.ValidationError) return BadRequest("Validation Errors:\n" + ex.Message);
+            if (code == ErrorCode.ValidationError) return BadRequest(new { validationErrors = ex.Message});
             return Problem(
                 detail: ex.Message,
                 statusCode: StatusCodes.Status500InternalServerError,
