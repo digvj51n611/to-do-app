@@ -1,0 +1,21 @@
+.side-bar {
+    border: 1px solid black;
+    width: 22.2vw;
+    height: 100vh;
+}
+.side-bar-button {
+    height: 60px;
+    box-shadow: 0px 0px 10px 3px rgba(0, 0, 0, 0.1);
+}
+.icon {
+    height: 25px;
+}
+.active {
+    background-color: var(--yellow);
+}
+.nav {
+    width: 100%;
+}
+.nav-item {
+    text-align: center;
+}

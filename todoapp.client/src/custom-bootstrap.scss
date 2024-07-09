@@ -1,0 +1,17 @@
+
+@font-face {
+    font-family: 'lexend-static-regular';
+    src: url('../src/assets/Fonts/Lexend/static/Lexend-Regular.ttf') format('truetype');
+}
+
+$primary : #edb046;
+$secondary : #ba5112;
+$font-family-sans-serif: 'lexend-static-regular', sans-serif;
+$font-family-base: 'lexend-static-regular';
+.fs-10 {
+    font-size: 10px !important;
+}
+.w-fit-content {
+    width: fit-content!important;
+}
+@import "../node_modules/bootstrap/scss/bootstrap.scss";

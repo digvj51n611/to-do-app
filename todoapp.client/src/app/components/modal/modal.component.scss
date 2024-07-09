@@ -1,0 +1,14 @@
+//the below style is temproary 
+.modal {
+    display: block;
+}
+.fade-placeholder::placeholder {
+    opacity: 1;
+    transition: opacity 0.5s ease-in-out;
+}
+.fade-placeholder:focus::placeholder {
+    opacity: 0.5;
+}
+.modal-btn {
+    border: 2px solid var(--yellow);
+}

@@ -1,21 +1,33 @@
-<div class="p-3 bg-primary rounded w-fit-content">
+<div class="p-3  rounded w-fit-content " [ngClass]="{
+    'bg-primary' : isRegister,
+    'bg-white' : !isRegister,
+    'shadow' : !isRegister
+}">
     <div class="inner custom-height-width">
         <header class="mx-auto">
-            <h4 class="font-b fw-bold text-white w-fit-content mx-auto">To-Do App</h4>
-            <p class="text-white fs-10 w-fit-content mx-auto">Start organizing your life day by day</p>
+            <h4 class="font-b fw-bold w-fit-content mx-auto" [ngClass]="{
+                'text-white' : isRegister,
+                'text-secondary':!isRegister
+            }">To-Do App</h4>
+            <p class=" fs-10 w-fit-content mx-auto" [class.text-white]="isRegister">Start organizing your life day by day</p>
         </header>
         <div class="mt-5">
-            <div class="mb-3 ">
+            <div class="mb-3 shadow">
                 <input type="text"class = "form-control form-control-sm input-height-md p-1" name="username" id="username" placeholder="Username">
             </div>
-            <div class="mb-3">
+            <div class="mb-3 shadow">
                 <input type="password" class = "form-control form-control-sm input-height-md p-1" name="password" id="password" placeholder="Password">
             </div>
             <div class="mx-auto w-fit-content mt-5">
-                <button class="btn btn-secondary" type="submit">Sign Up</button>
+                <button class="btn" type="submit" [ngClass]="{
+                    'btn-secondary':isRegister,
+                    'text-dark' : !isRegister,
+                    'btn-primary' : !isRegister
+                }">{{isRegister? 'Sign Up': 'Sign In'}}</button>
             </div>
             <div class="mx-auto w-fit-content">
-                <span class="fs-10 text-white">Already have an account? Sign in </span><span class="fs-10 text-secondary">here</span>
+                <span class="fs-10 " [class.text-white]="isRegister">{{isRegister?'Already have an account? Sign in ' :"Don't have an account? Create "}}</span>
+                <span class="fs-10 text-secondary">here</span>
             </div>
         </div>
     </div>
