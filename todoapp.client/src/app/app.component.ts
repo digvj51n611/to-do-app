@@ -15,5 +15,5 @@ import { MainContentComponent } from './layouts/main-content/main-content.compon
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'todoapp.client';
+  title = 'ToDoApp';
 }
