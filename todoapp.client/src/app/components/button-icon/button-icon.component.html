@@ -1,1 +1,4 @@
-<p>button-icon works!</p>
+<div class="d-flex justify-content-center  align-items-center rounded mb-5 px-1" [ngClass]="bgClassList">
+    <button class="btn" [ngClass]="btnClassList" type="button" >{{buttonName}}</button>
+    <ng-content></ng-content>
+</div>
