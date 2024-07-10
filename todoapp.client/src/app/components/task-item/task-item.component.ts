@@ -8,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './task-item.component.scss'
 })
 export class TaskItemComponent {
-
+  
 }
