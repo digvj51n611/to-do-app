@@ -1,1 +1,23 @@
-<p>task-group works!</p>
+<div class="px-5">
+    <div class="task-group-header d-flex justify-content-between align-items-center"> 
+        <h5 class="fw-bold">{{taskGroupHeader}}</h5>
+        <p class="text-secondary">Delete All</p>
+        <p></p>
+    </div>
+    <div class="row">
+        <div class="task-list col">
+            <ul class="list-group">
+                <li class="list-group-item my-2">
+                    <app-task-item></app-task-item>
+                </li>
+                <li class="list-group-item my-2">
+                    <app-task-item></app-task-item>
+                </li>
+            </ul>
+        </div>
+        <div class="chart-section d-flex flex-column justify-content-between gap-3 col-3">
+            <app-stats-card [isActiveCard]="tempBoolean" [ratioValue]="tempNumber"></app-stats-card>
+            <app-stats-card [isActiveCard]="!tempBoolean" [ratioValue]="1-tempNumber"></app-stats-card>
+        </div>
+    </div>
+</div>
