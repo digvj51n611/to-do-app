@@ -1,1 +1,14 @@
-<p>stats-card works!</p>
+<div class="stats-card rounded" [class.bg-primary]="isActiveCard" [class.bg-secondary]="!isActiveCard">
+    <div class="icon d-flex justify-content-center">
+        <i *ngIf="isActiveCard;else circleCheck" class="bi bi-clock-fill text-white icon"></i>
+        <ng-template #circleCheck>
+            <i class="bi bi-check-circle-fill text-white icon"></i> 
+        </ng-template>
+    </div>
+    <div class="percentage d-flex justify-content-center">
+        <p class="text-white fs-3 fw-bold mb-0">{{ratioValue | percent }}</p>
+    </div>
+    <div class="stats-category d-flex justify-content-center">
+        <p class="text-white mb-0 custom-font-size">{{isActiveCard? 'Active Tasks':'Completed Tasks'}}</p>
+    </div>
+</div>
