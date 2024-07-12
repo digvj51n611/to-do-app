@@ -21,7 +21,7 @@
     height: 18px;
     width: 18px;
     background-color: white;
-    border: 2px solid #2196F3;
+    border: 2px solid var(--yellow);
 }
 
 .custom-checkbox:hover input ~ .checkmark {
@@ -29,7 +29,7 @@
 }
 
 .custom-checkbox input:checked ~ .checkmark {
-    background-color: #2196F3;
+    background-color: var(--brown);
 }
 
 .checkmark:after {
@@ -40,11 +40,15 @@
     top: 10%;
     width: 5px;
     height: 10px;
-    border: solid #2196F3;
-    border-width: 0 3px 3px 0;
+    border: solid var(--yellow);
+    border-width: 0 2px 2px 0;
     transform: rotate(45deg);
 }
 
 .custom-checkbox input:checked ~ .checkmark:after {
     border-color: white;
+}
+
+.custom-rounded {
+    border-radius: 3px;
 }
