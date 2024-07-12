@@ -9,7 +9,7 @@ import { Observable,map} from 'rxjs';
 export class TaskService {
   constructor(private httpService : HttpService) {
   }
-  getAllTasks() : Observable<Response<TaskItem>> {
+  getAllTasks() : Observable<Response<TaskItem[]>> {
     return this.httpService.getAll<TaskItem>();
   }
   getTask(id : number ) : Observable<Response<TaskItem>>{

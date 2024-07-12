@@ -35,7 +35,7 @@ export class HttpService {
       }
     }
   }
-  getAll<T>():Observable<Response<T>> {
+  getAll<T>():Observable<Response<T[]>> {
     return this.http.get<T>(this.url, {
       headers : this.headers
     })
