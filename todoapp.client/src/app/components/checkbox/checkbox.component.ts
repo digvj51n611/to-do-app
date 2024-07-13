@@ -1,4 +1,4 @@
-import { Component , Output, EventEmitter, ViewChild, ElementRef} from '@angular/core';
+import { Component , Output,Input, EventEmitter, ViewChild, ElementRef} from '@angular/core';
 
 @Component({
   selector: 'app-checkbox',
@@ -8,6 +8,7 @@ import { Component , Output, EventEmitter, ViewChild, ElementRef} from '@angular
   styleUrl: './checkbox.component.scss'
 })
 export class CheckboxComponent {
+  @Input({required : true}) checked : boolean = false;
   @Output() changeEvent = new EventEmitter<boolean>();
   onChange(event : Event ) {
     var target = event.currentTarget as HTMLInputElement;

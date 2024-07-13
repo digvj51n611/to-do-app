@@ -1,3 +1,5 @@
+import { TaskStatus } from "./enums"
+
 export interface TaskItem {
     taskId : number
     title : string

@@ -6,14 +6,11 @@
             <p class="fs-7">{{formattedDate}}</p>
         </div>
     </div>
-    <div class="task-group-content row mt-1">
+    <div class="task-group-content row ">
         <div class="task-list col">
             <ul class="task-list-ul list-group">
-                <li class="task-list-li rounded list-group-item mb-3" >
-                    <app-task-item></app-task-item>
-                </li>
-                <li class="task-list-li rounded bg-primary list-group-item mb-3" >
-                    <app-task-item></app-task-item>
+                <li *ngFor="let task of taskList;let i = index;" class="task-list-li rounded list-group-item mb-3" [class.bg-primary]="isStatusComplete(task.taskStatus)">
+                    <app-task-item (changeEvent)="onChange($event,i)" [task]="task"></app-task-item>
                 </li>
             </ul>
         </div>

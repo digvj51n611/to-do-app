@@ -1,8 +1,8 @@
 <div class="task-item-row d-flex justify-content-start align-items-center px-2 gap-3">
     <div class="status-checkbox">
-        <app-checkbox (changeEvent)="onChange($event)"></app-checkbox>
+        <app-checkbox [checked]="isComplete(task?.taskStatus)" (changeEvent)="onChange($event)"></app-checkbox>
     </div>
     <div>
-        <p class="fs-7 mb-0">task title here </p>
+        <p class="fs-7 mb-0">{{task?.title}}</p>
     </div>
 </div>
