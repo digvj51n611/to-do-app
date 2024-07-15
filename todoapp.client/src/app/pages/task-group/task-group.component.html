@@ -14,9 +14,9 @@
                 </li>
             </ul>
         </div>
-        <div class="chart-section d-flex flex-column align-items-center gap-3 col-3">
-            <app-stats-card [isActiveCard]="tempBoolean" [ratioValue]="tempNumber"></app-stats-card>
-            <app-stats-card [isActiveCard]="!tempBoolean" [ratioValue]="1-tempNumber"></app-stats-card>
+        <div *ngIf="isModeDashBoard()" class="chart-section d-flex flex-column align-items-center gap-3 col-3">
+            <app-stats-card [isActiveCard]="false" [ratioValue]="tempNumber"></app-stats-card>
+            <app-stats-card [isActiveCard]="true" [ratioValue]="1-tempNumber"></app-stats-card>
         </div>
     </div>
 </div>

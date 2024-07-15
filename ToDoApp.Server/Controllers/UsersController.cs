@@ -9,13 +9,13 @@ namespace ToDoApp.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly ToDoDbContext _context;
         private readonly IUserService _userService;
         public UsersController(ToDoDbContext context,IUserService service)
         {
+            Console.WriteLine("Controller Working");
             _context = context;
             _userService = service;
         }
@@ -79,16 +79,20 @@ namespace ToDoApp.Server.Controllers
 
         // POST: api/Users/register
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("/register")]
+        [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<UserDto>> PostUser(UserDto userDto)
         {
+            Console.WriteLine("Hello buddy");
             var serviceResult = await _userService.AddUserServiceAsync(userDto);
             if (serviceResult.IsSuccess)
             {
+                Console.WriteLine("Succesful");
                 return Ok(serviceResult.Result);
             }
             else
             {
+                Console.WriteLine("Unsuccessful");
                 return ResultFromCode<UserDto>(serviceResult.ErrorCode, serviceResult.Exception!);
             }
         }

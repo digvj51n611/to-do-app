@@ -1,26 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit , Input} from '@angular/core';
 import { TaskItemComponent } from '../../components/task-item/task-item.component';
 import { StatsCardComponent } from '../../components/stats-card/stats-card.component';
-import { DatePipe, NgFor } from '@angular/common';
+import { DatePipe, NgFor, NgIf } from '@angular/common';
 import { TaskItem } from '../../data/models';
 import { TaskService } from '../../../services/data/task/task.service';
-import { map } from 'rxjs';
-import { TaskStatus } from '../../data/enums';
+import { TaskStatus, taskGroupMode } from '../../data/enums';
 
 @Component({
   selector: 'app-task-group',
   standalone: true,
-  imports: [TaskItemComponent,StatsCardComponent,NgFor],
+  imports: [TaskItemComponent,StatsCardComponent,NgFor,NgIf],
   templateUrl: './task-group.component.html',
   styleUrl: './task-group.component.scss',
   providers :[DatePipe]
 })
 export class TaskGroupComponent implements OnInit {
-  taskGroupHeader : string = "Today's Tasks";
-  tempBoolean : boolean = false;
+  @Input() taskGroupMode : taskGroupMode = taskGroupMode.all;
+  taskGroupHeader! : string ;
   tempNumber : number = 0.4;
-  formattedDate : string | null ;
-  taskList : TaskItem[] = [
+  formattedDate : string | null;
+  taskList : TaskItem[] = [ 
     { taskId: 1, title: 'Task 1', description: 'Description for task 1', timeAdded: new Date('2023-01-01T08:00:00'), taskStatus: TaskStatus.pending },
     { taskId: 2, title: 'Task 2', description: 'Description for task 2', timeAdded: new Date('2023-02-01T09:00:00'), taskStatus: TaskStatus.completed },
     { taskId: 3, title: 'Task 3', description: 'Description for task 3', timeAdded: new Date('2023-03-01T10:00:00'), taskStatus: TaskStatus.completed },
@@ -35,7 +34,7 @@ export class TaskGroupComponent implements OnInit {
   elseComponentMessage : string = '';
   constructor(private datePipe : DatePipe,private service : TaskService ) {
     const date = new Date(); 
-    this.formattedDate = this.datePipe.transform(date, 'EEEE, dd MMMM yyyy');    
+    this.formattedDate = this.datePipe.transform(date, 'EEEE, dd MMMM yyyy');   
   }
   ngOnInit(): void {
     this.service.getAllTasks()
@@ -47,14 +46,19 @@ export class TaskGroupComponent implements OnInit {
         this.elseComponentMessage = 'No Tasks Found for Today';
       }
     });
+    this.setTaskHeader();
   }
   onChange(checked : boolean , index : number ): void {
     this.taskList[index].taskStatus = checked? TaskStatus.completed : TaskStatus.pending;
+    console.log( this.taskGroupMode);
   }
   isStatusComplete(status : TaskStatus ): boolean {
     return status === TaskStatus.completed;
   }
-  trackFn(  index : number, item : TaskItem) {
-    return index;
+  isModeDashBoard() {
+    return this.taskGroupMode == taskGroupMode.all
+  }
+  setTaskHeader() {
+    this.taskGroupHeader = `Today's ${this.taskGroupMode.toString()} Tasks`; 
   }
 }

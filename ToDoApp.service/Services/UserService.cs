@@ -3,6 +3,7 @@ using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
 using ToDoApp.Data.Entities;
@@ -25,6 +26,7 @@ namespace ToDoApp.Service.Services
         }
         private async Task<bool> IsUserUniqueAsync(UserDto userDto)
         {
+            Console.WriteLine("Entereed the unique mehtod");
             var serviceResult = await GetUsernamesAsync();
             List<string> names = serviceResult.Result!;
             if (names.FirstOrDefault(name => name == userDto.Username) != null)
@@ -87,12 +89,13 @@ namespace ToDoApp.Service.Services
                 List<UserDto> resultList = new List<UserDto>();
                 foreach (var task in result)
                 {
-                    resultList.Add(_mapper.Map<UserDto>(result));
+                    resultList.Add(_mapper.Map<UserDto>(task));
                 }
                 return ServiceResult<List<UserDto>>.SuccessResult(resultList);
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
                 return ServiceResult<List<UserDto>>.FailureResult(ex, ErrorCode.ServerError);
             }
         }
@@ -102,14 +105,16 @@ namespace ToDoApp.Service.Services
             {
                 try
                 {
+                    Console.WriteLine("the validation calling before");
                     ValidateUser(userDto);
+                    await IsUserUniqueAsync(userDto);
                 }
                 catch(Exception ex )
                 {
-                    Console.WriteLine("validation catch called");
+                    Console.WriteLine(ex.Message);
                     return ServiceResult<UserDto>.FailureResult(ex, ErrorCode.ValidationError);
                 }
-                await IsUserUniqueAsync(userDto);
+          
                 userDto.Password = GetHashedPassword(userDto);
                 User user = _mapper.Map<User>(userDto);
                 var result = await _userRepo.AddUserAsync(user);
