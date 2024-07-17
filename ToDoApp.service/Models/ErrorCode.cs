@@ -9,9 +9,12 @@ namespace ToDoApp.Service.Models
 {
     public enum ErrorCode
     {
+        NoError,
         NotFoundError,
         ServerError,
         ValidationError,
-        AuthenticationError
+        AuthenticationError,
+        UnknownError,
+        ServiceError
     }
 }

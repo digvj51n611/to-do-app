@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
+using Azure.Core;
 using FluentValidation;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using ToDoApp.Data.Entities;
 using ToDoApp.Data.IRepos;
+using ToDoApp.Data.Models;
 using ToDoApp.Service.IServices;
 using ToDoApp.Service.Models;
 
@@ -16,41 +21,56 @@ namespace ToDoApp.Service.Services
         private IMapper _mapper;
         private  IValidator<TaskDto> _validator;
         private IHttpContextAccessor _httpContextAccessor;
-        public TaskItemService(ITaskItemRepo taskItemRepo , IMapper mapper ,IValidator<TaskDto> validator,IHttpContextAccessor httpContextAccessor)
+        private IUserService _userService;
+        public TaskItemService(ITaskItemRepo taskItemRepo , IMapper mapper ,IValidator<TaskDto> validator,IHttpContextAccessor httpContextAccessor,IUserService userService)
         {
             _taskItemRepo = taskItemRepo;
             _mapper = mapper;
             _validator = validator;
             _httpContextAccessor = httpContextAccessor;
+            _userService = userService;
         }
         public async Task<ServiceResult<TaskDto>> GetTaskServiceAsync(int id)
         {
             try
             {
-                TaskItem result = await _taskItemRepo.GetTaskItemAsync(id);
-                return ServiceResult<TaskDto>.SuccessResult(_mapper.Map<TaskDto>(result));
+
+                var result = await _taskItemRepo.GetTaskItemAsync(id);
+                if(result.IsSuccess)
+                {
+                    return ServiceResult<TaskDto>.SuccessResult(_mapper.Map<TaskDto>(result.Data));
+                }
+                else
+                {
+                    return ServiceResult<TaskDto>.FailureResult(result.ErrorType , result.Message);
+                }
             }
             catch (Exception ex)
             {
-                var result =  ServiceResult<TaskDto>.FailureResult(ex, ErrorCode.ServerError);
-                result.ErrorCode = ErrorCode.ServerError;
-                return result;
+                return ServiceResult<TaskDto>.FailureResult(ErrorCode.ServerError,ex.Message);
             }
         }
         public async Task<ServiceResult<List<TaskDto>>> GetTasksByUserServiceAsync()
         {
             try
             {
-                string? name = _httpContextAccessor?.HttpContext?.User?.Claims?.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
-                List<TaskItem> tasks = await _taskItemRepo.GetTaskItemsAsync();
-                List<TaskItem> userNameTasks = tasks.Where(task => task.User.Username == name).ToList();
-                return ServiceResult<List<TaskDto>>.SuccessResult(ConvertList(userNameTasks));
+                string name = GetCurrentUserName();
+                if( name == "")
+                {
+                    return ServiceResult<List<TaskDto>>.FailureResult(ErrorCode.AuthenticationError,"User Not Found");
+                }
+                var result = await _taskItemRepo.GetTaskItemsAsync();
+                if(!result.IsSuccess)
+                {
+                    return ServiceResult<List<TaskDto>>.FailureResult(result.ErrorType , result.Message);
+                }
+                List<TaskItem> userTasks = result.Data!.Where(task => task.User.Username == name).ToList();
+                return ServiceResult<List<TaskDto>>.SuccessResult(ConvertListToDto(userTasks));
             }
             catch(Exception ex)
             {
-                var serviceResult = ServiceResult<List<TaskDto>>.FailureResult(ex , ErrorCode.ServerError);
-                serviceResult.ErrorCode = ErrorCode.ServerError;
-                return serviceResult;
+                return  ServiceResult<List<TaskDto>>.FailureResult(ErrorCode.ServiceError,ex.Message);
+                
             }
         }
         //public  async Task<ServiceResult<List<TaskDto>>> GetTasksServiceAsync()
@@ -69,43 +89,44 @@ namespace ToDoApp.Service.Services
         {
             try
             {
-                try
+                
+                var validationResult = ValidateTask(taskDto);  
+                if(!validationResult.IsValid)
                 {
-                    ValidateTask(taskDto);  
+                    return ServiceResult<TaskDto>.FailureResult(ErrorCode.ValidationError,"Validation Error",validationResult.ValidationErrors);
                 }
-                catch(Exception ex )
-                {
-                    return ServiceResult<TaskDto>.FailureResult(ex , ErrorCode.ValidationError);
-                }
+
                 TaskItem taskItem = _mapper.Map<TaskItem>(taskDto);
-                taskItem.UserId = AssignUser();
+                //The following line to be added modidfied later ;;; 
+                taskItem.UserId = GetCurrentUserId();
                 var result = await _taskItemRepo.AddTaskItemAsync(taskItem);
                 return ServiceResult<TaskDto>.SuccessResult(_mapper.Map<TaskDto>(result));
             }
-            catch( Exception ex)
+            catch(Exception ex)
             {
-                return ServiceResult<TaskDto>.FailureResult(ex,ErrorCode.ServerError);
+                return ServiceResult<TaskDto>.FailureResult(ErrorCode.ServerError,ex.Message);
             }
         }
         public async Task<ServiceResult<TaskDto>> UpdateTaskServiceAsync(TaskDto taskDto)
         {
             try
             {
-                try
+                ValidationResult validationResult = ValidateTask(taskDto);
+                if(!validationResult.IsValid)
                 {
-                    ValidateTask(taskDto);
-                }
-                catch(Exception ex)
-                {
-                    return ServiceResult<TaskDto>.FailureResult(ex, ErrorCode.ValidationError);
+                    return ServiceResult<TaskDto>.FailureResult(ErrorCode.ValidationError,"Validation Error",validationResult.ValidationErrors);
                 }
                 TaskItem task = _mapper.Map<TaskItem>(taskDto);
-                var result = await _taskItemRepo.UpdateTaskItemAsync(task);
-                return ServiceResult<TaskDto>.SuccessResult(_mapper.Map<TaskDto>(result));
+                DataResponse<TaskItem> result = await _taskItemRepo.UpdateTaskItemAsync(task);
+                if(result.IsSuccess)
+                {
+                    return ServiceResult<TaskDto>.SuccessResult(_mapper.Map<TaskDto>(result.Data));
+                }
+                return ServiceResult<TaskDto>.FailureResult(result.ErrorType,result.Message);
             }
             catch( Exception ex)
             {
-                return ServiceResult<TaskDto>.FailureResult(ex, ErrorCode.ServerError);
+                return ServiceResult<TaskDto>.FailureResult(ErrorCode.ServiceError,ex.Message);
             }
         }
         public async Task<ServiceResult<TaskDto>> DeleteTaskServiceAsync(int id)
@@ -113,29 +134,49 @@ namespace ToDoApp.Service.Services
             try
             {
                 var result = await _taskItemRepo.DeleteTaskItemAsync(id);
-                return ServiceResult<TaskDto>.SuccessResult(_mapper.Map<TaskDto>(result));
+                if(result.IsSuccess)
+                {
+                    return ServiceResult<TaskDto>.SuccessResult(_mapper.Map<TaskDto>(result.Data));
+                }
+                return ServiceResult<TaskDto>.FailureResult(ErrorCode.ServiceError);
             }
             catch (Exception ex)
             {
-                return ServiceResult<TaskDto>.FailureResult(ex,ErrorCode.ServerError);
+                return ServiceResult<TaskDto>.FailureResult(ErrorCode.ServerError,ex.Message);
             }
         }
-        private bool ValidateTask(TaskDto taskDto)
+        private ValidationResult ValidateTask(TaskDto taskDto)
         {
+            List<string> validationMessages = new List<string>();
             if (taskDto == null)
             {
-                return false;
+                validationMessages.Add("Null can't be validated");
+                return new ValidationResult
+                {
+                    IsValid = false,
+                    ValidationErrors = validationMessages
+                };
             }
-            string errorMessageString = "";
             var validationResult = _validator.Validate(taskDto);
-            if (validationResult.IsValid) return true;
+            if (validationResult.IsValid)
+            {
+                return new ValidationResult
+                {
+                    IsValid = validationResult.IsValid,
+                    ValidationErrors = validationMessages
+                };
+            }
             foreach (var error in validationResult.Errors)
             {
-                errorMessageString += "\n" + error.ErrorMessage;
+                validationMessages.Add(error.ErrorMessage);
             }
-            throw new Exception(errorMessageString);
+            return new ValidationResult
+            {
+                IsValid = false,
+                ValidationErrors = validationMessages
+            };
         }
-        private List<TaskDto> ConvertList(List<TaskItem> tasks)
+        private List<TaskDto> ConvertListToDto(List<TaskItem> tasks)
         {
             List<TaskDto> taskDtos = new List<TaskDto>();
             foreach (var task in tasks)
@@ -144,9 +185,18 @@ namespace ToDoApp.Service.Services
             }
             return taskDtos;
         }
-        private int AssignUser()
+        private string GetCurrentUserName()
         {
-            var result = _httpContextAccessor?.HttpContext?.User.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub);
+            var subject = _httpContextAccessor.HttpContext?.User.Claims.FirstOrDefault(claim => claim.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            if(subject != null )
+            {
+                return subject;
+            }
+            return "";
+        }
+        private int GetCurrentUserId()
+        {
+            var userName = GetCurrentUserName();
             return 1;
         }
     }
