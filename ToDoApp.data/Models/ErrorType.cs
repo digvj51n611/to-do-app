@@ -9,10 +9,11 @@ namespace ToDoApp.Data.Models
     public enum ErrorType
     {
         None,
-        Unknown,
+        UnknownError,
         ConnectionError,
         SourceError,
         ValidationError,
-        NotFoundError
+        NotFoundError,
+        SaveChangesError
     }
 }
