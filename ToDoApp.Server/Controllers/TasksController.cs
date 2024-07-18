@@ -1,18 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ToDoApp.Data.Entities;
-using ToDoApp.data;
-using ToDoApp.Service.Services;
 using ToDoApp.Service.IServices;
 using ToDoApp.Service.Models;
-using System.Net;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Authorization;
+using ToDoApp.Server.Models;
+using NuGet.Protocol;
+using ToDoApp.Server.Helpers;
 
 namespace ToDoApp.Server.Controllers
 {
@@ -27,29 +20,16 @@ namespace ToDoApp.Server.Controllers
         {
             _taskService = service;
         }
-        private ActionResult<T> ResultFromCode<T>(ErrorCode? code,Exception ex)
-        {
-            if(code == ErrorCode.NotFoundError) return NotFound(ex.Message);
-            if(code == ErrorCode.AuthenticationError) return Unauthorized("Unauthorized");
-            if(code == ErrorCode.ValidationError) return BadRequest("Validation Errors:\n"+ex.Message);
-            return Problem(
-                detail: ex.Message,
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "An unexpected error occurred.");
-        }
         // GET: api/Tasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TaskDto>>> GetTasks()
+        public async Task<ActionResult<List<TaskDto>>> GetTasks()
         {
             var serviceResult = await _taskService.GetTasksByUserServiceAsync();
             if(serviceResult.IsSuccess)
             {
-                return Ok(serviceResult.Result);
+                return Ok(ApiResponse<List<TaskDto>>.CreateApiResponse(serviceResult));
             }
-            else
-            {
-                return ResultFromCode<IEnumerable<TaskDto>>(serviceResult.ErrorCode, serviceResult.Exception!);
-            }
+            return this.FailedObjectResult(serviceResult);
         }
 
         // GET: api/Tasks/5
@@ -59,12 +39,9 @@ namespace ToDoApp.Server.Controllers
             var serviceResult = await _taskService.GetTaskServiceAsync(id);
             if (serviceResult.IsSuccess)
             {
-                return Ok(serviceResult.Result);
+                return Ok(ApiResponse<TaskDto>.CreateApiResponse(serviceResult));
             }
-            else
-            {
-                return ResultFromCode<TaskDto>(serviceResult.ErrorCode, serviceResult.Exception!);
-            }
+            return this.FailedObjectResult(serviceResult);
         }
 
         // PUT: api/Tasks/5
@@ -75,12 +52,10 @@ namespace ToDoApp.Server.Controllers
             var serviceResult = await _taskService.UpdateTaskServiceAsync(taskDto);
             if (serviceResult.IsSuccess)
             {
-                return Ok(serviceResult.Result);
+                return Ok(ApiResponse<TaskDto>.CreateApiResponse(serviceResult));
             }
-            else
-            {
-                return ResultFromCode<TaskDto>(serviceResult.ErrorCode, serviceResult.Exception!);
-            }
+            return this.FailedObjectResult(serviceResult);
+
         }
 
         // POST: api/Tasks
@@ -91,12 +66,9 @@ namespace ToDoApp.Server.Controllers
             var serviceResult = await _taskService.AddTaskServiceAsync(taskDto);
             if (serviceResult.IsSuccess)
             {
-                return Created();
+                return Ok(ApiResponse<TaskDto>.CreateApiResponse(serviceResult));
             }
-            else
-            {
-                return ResultFromCode<TaskDto>(serviceResult.ErrorCode, serviceResult.Exception!);
-            }
+            return this.FailedObjectResult(serviceResult);
         }
 
         // DELETE: api/Tasks/5
@@ -106,12 +78,9 @@ namespace ToDoApp.Server.Controllers
             var serviceResult = await _taskService.DeleteTaskServiceAsync(id);
             if (serviceResult.IsSuccess)
             {
-                return Ok(serviceResult.Result);
+                return Ok(ApiResponse<TaskDto>.CreateApiResponse(serviceResult));
             }
-            else
-            {
-                return ResultFromCode<TaskDto>(serviceResult.ErrorCode, serviceResult.Exception!);
-            }
+            return this.FailedObjectResult(serviceResult);
         }
 
         //private bool TaskItemExists(int id)

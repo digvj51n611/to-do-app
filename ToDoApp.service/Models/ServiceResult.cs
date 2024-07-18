@@ -11,7 +11,7 @@ namespace ToDoApp.Service.Models
     {
         public bool IsSuccess { get; set; }
         public TResult? Result { get; set; }
-        public ErrorCode? ErrorCode { get; set; }
+        public ErrorCode ErrorCode { get; set; }
         public string Message { get; set; }
         public List<string>? ValidationErrors { get; set; } 
         public ServiceResult()
@@ -19,7 +19,7 @@ namespace ToDoApp.Service.Models
             Message = "";
             ValidationErrors = new List<string>();
         }
-        public ServiceResult(bool success, TResult? result, ErrorCode? code = null , string message = "",List<string>? validationErrors = null)
+        public ServiceResult(bool success, TResult? result, ErrorCode code = ErrorCode.NoError , string message = "",List<string>? validationErrors = null)
         {
             IsSuccess = success;
             Result = result;
