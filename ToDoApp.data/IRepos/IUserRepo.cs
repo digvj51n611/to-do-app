@@ -4,15 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoApp.Data.Entities;
+using ToDoApp.Data.Models;
 
 namespace ToDoApp.Data.IRepos
 {
     public interface IUserRepo
     {
-        public Task<User> GetUserAsync(string username);
-        public Task<List<User>> GetUsersAsync();
-        public Task<User> AddUserAsync(User user);
-        public Task<User> UpdateUserAsync(User user);
-        public Task<User> DeleteUserAsync(string username);
+        public Task<DataResponse<User>> GetUserAsync(string username);
+        public Task<DataResponse<List<User>>> GetUsersAsync();
+        public Task<DataResponse<User>> AddUserAsync(User user);
+        public Task<DataResponse<User>> UpdateUserAsync(User user);
+        public Task<DataResponse<User>> DeleteUserAsync(string username);
     }
 }
