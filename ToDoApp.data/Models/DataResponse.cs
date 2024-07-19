@@ -13,7 +13,7 @@ namespace ToDoApp.Data.Models
     {
         public bool IsSuccess { get; set; }
         public string Message { get; set; }
-        public TData? Data { get; set; }
+        public TData Data { get; set; }
         public ErrorType ErrorType { get; set; }
         public static DataResponse<TData> SuccessResult(TData data, string message = "fetch successful")
         {

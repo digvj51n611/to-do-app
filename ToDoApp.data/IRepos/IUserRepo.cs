@@ -10,10 +10,10 @@ namespace ToDoApp.Data.IRepos
 {
     public interface IUserRepo
     {
-        public Task<DataResponse<User>> GetUserAsync(string username);
+        public Task<DataResponse<User>> GetUserAsync(int id);
         public Task<DataResponse<List<User>>> GetUsersAsync();
         public Task<DataResponse<User>> AddUserAsync(User user);
         public Task<DataResponse<User>> UpdateUserAsync(User user);
-        public Task<DataResponse<User>> DeleteUserAsync(string username);
+        public Task<DataResponse<User>> DeleteUserAsync(int id);
     }
 }

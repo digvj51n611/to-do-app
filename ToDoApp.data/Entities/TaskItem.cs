@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ToDoApp.Data.Entities
 {
-    public class TaskItem
+    public class TaskItem : BaseEntity
     {
-        public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime AddedOnUtc { get; set; }
