@@ -8,7 +8,7 @@ using ToDoApp.Data.Entities;
 
 namespace ToDoApp.Service.Models
 {
-    public class TaskDto
+    public class TaskDto : BaseDto
     {
         public int Id { get; set; }
         public string Title { get; set; }

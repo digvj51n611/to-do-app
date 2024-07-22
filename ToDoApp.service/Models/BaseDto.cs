@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ToDoApp.Service.Models
 {
-    public class UserDto : BaseDto
+    public abstract class BaseDto
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
+
     }
 }

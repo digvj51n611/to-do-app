@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ToDoApp.Service.Models
 {
-    public class ValidationResult
+    public class DtoValidationResult
     {
         public bool IsValid { get; set; }
         public List<string> ValidationErrors { get; set; }
-        public ValidationResult()
+        public DtoValidationResult()
         {
             ValidationErrors = new List<string>();
         }
