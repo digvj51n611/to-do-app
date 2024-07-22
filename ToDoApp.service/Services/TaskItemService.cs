@@ -15,26 +15,23 @@ using ToDoApp.Service.Models;
 
 namespace ToDoApp.Service.Services
 {
-    public class TaskItemService : BaseService, ITaskItemService
+    public class TaskItemService : BaseService<TaskDto>, ITaskItemService
     {
         private ITaskItemRepo _taskItemRepo;
         private IMapper _mapper;
-        private IValidator<TaskDto> _validator;
         private IHttpContextAccessor _httpContextAccessor;
-        private IUserService _userService;
-        public TaskItemService(ITaskItemRepo taskItemRepo , IMapper mapper ,IValidator<TaskDto> validator,IHttpContextAccessor httpContextAccessor,IUserService userService)
+        private IUserHelper _userHelper;
+        public TaskItemService(ITaskItemRepo taskItemRepo,IMapper mapper,IValidator<TaskDto> validator,IHttpContextAccessor httpContextAccessor,IUserHelper helper):base(validator)
         {
             _taskItemRepo = taskItemRepo;
             _mapper = mapper;
-            _validator = validator;
             _httpContextAccessor = httpContextAccessor;
-            _userService = userService;
+            _userHelper = helper;
         }
         public async Task<ServiceResult<TaskDto>> GetTaskServiceAsync(int id)
         {
             try
             {
-
                 var result = await _taskItemRepo.GetAsync(id);
                 if(result.IsSuccess)
                 {
@@ -89,7 +86,7 @@ namespace ToDoApp.Service.Services
         {
             try
             {
-                DtoValidationResult validationResult = Validate(taskDto, _validator.Validate);
+                DtoValidationResult validationResult = Validate(taskDto);
                 
                 if(!validationResult.IsValid)
                 {
@@ -110,7 +107,7 @@ namespace ToDoApp.Service.Services
         {
             try
             {
-                DtoValidationResult validationResult = Validate(taskDto, _validator.Validate);
+                DtoValidationResult validationResult = Validate(taskDto);
                 if (!validationResult.IsValid)
                 {
                     return ServiceResult<TaskDto>.FailureResult(ErrorCode.ValidationError,"Validation Error",validationResult.ValidationErrors);
@@ -150,37 +147,6 @@ namespace ToDoApp.Service.Services
             {
                 return ServiceResult<TaskDto>.FailureResult(ErrorCode.ServerError,ex.Message);
             }
-        }
-        private DtoValidationResult ValidateTask(TaskDto taskDto)
-        {
-            List<string> validationMessages = new List<string>();
-            if (taskDto == null)
-            {
-                validationMessages.Add("Null can't be validated");
-                return new DtoValidationResult
-                {
-                    IsValid = false,
-                    ValidationErrors = validationMessages
-                };
-            }
-            var validationResult = _validator.Validate(taskDto);
-            if (validationResult.IsValid)
-            {
-                return new DtoValidationResult
-                {
-                    IsValid = validationResult.IsValid,
-                    ValidationErrors = validationMessages
-                };
-            }
-            foreach (var error in validationResult.Errors)
-            {
-                validationMessages.Add(error.ErrorMessage);
-            }
-            return new DtoValidationResult
-            {
-                IsValid = false,
-                ValidationErrors = validationMessages
-            };
         }
         private List<TaskDto> ConvertListToDto(List<TaskItem> tasks)
         {

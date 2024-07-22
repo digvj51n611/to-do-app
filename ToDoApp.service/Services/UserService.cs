@@ -11,16 +11,16 @@ using ToDoApp.Service.Models;
 
 namespace ToDoApp.Service.Services
 {
-    public class UserService : BaseService, IUserService
+    public class UserService : BaseService<UserDto>, IUserService ,IUserHelper
     {
         private IUserRepo _userRepo;
         private IMapper _mapper;
         private IValidator<UserDto> _validator;
-        public UserService(IUserRepo userRepo, IMapper mapper, IValidator<UserDto> validator)
+        public UserService(IUserRepo userRepo, IMapper mapper, IValidator<UserDto> validator):base(validator)
         {
             _userRepo = userRepo;
             _mapper = mapper;
-            _validator = validator;
+            //_validator = validator;
         }
         private async Task<bool> IsUserUniqueAsync(UserDto userDto)
         {
@@ -28,21 +28,9 @@ namespace ToDoApp.Service.Services
             List<string> names = serviceResult.Result!;
             if (names.FirstOrDefault(name => name == userDto.Username) != null)
             {
-                throw new Exception("User with that username already exists");
+                return false;
             }
             return true;
-        }
-        private bool ValidateUser(UserDto userDto)
-        {
-            if (userDto == null) return false;
-            var result = _validator.Validate(userDto);
-            if (result.IsValid) return true;
-            string errorMessage = "";
-            foreach (var error in result.Errors)
-            {
-                errorMessage += error + "\n";
-            }
-            throw new Exception(errorMessage);
         }
         private string GetHashedPassword(UserDto userDto)
         {
@@ -105,7 +93,7 @@ namespace ToDoApp.Service.Services
         {
             try
             {
-                var validationResult = Validate(userDto, _validator.Validate);
+                var validationResult = Validate(userDto);
                 if (!validationResult.IsValid)
                 {
                     return ServiceResult<UserDto>.FailureResult(ErrorCode.ValidationError,"Validation Error",validationResult.ValidationErrors);
@@ -128,7 +116,7 @@ namespace ToDoApp.Service.Services
         {
             try
             {
-                var validationResult = Validate(userDto, _validator.Validate);
+                var validationResult = Validate(userDto);
                 if (!validationResult.IsValid)
                 {
                     return ServiceResult<UserDto>.FailureResult(ErrorCode.ValidationError,"Validaiton Errors",validationResult.ValidationErrors);

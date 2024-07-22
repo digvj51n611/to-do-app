@@ -1,12 +1,20 @@
-﻿using FluentValidation;
+﻿using AutoMapper;
+using FluentValidation;
 using FluentValidation.Results;
+using System.Runtime.InteropServices;
+using ToDoApp.Data.Entities;
 using ToDoApp.Service.Models;
 
 namespace ToDoApp.Service.Services
 {
-    public class BaseService
+    public class BaseService<TDto>
     {
-        protected static DtoValidationResult Validate<TDto>(TDto baseDto, Func<TDto, ValidationResult> validator)
+        private readonly IValidator<TDto> _validator;
+        public BaseService(IValidator<TDto> validator)
+        {
+            _validator = validator;
+        }
+        protected DtoValidationResult Validate(TDto baseDto)
         {
             List<string> validationMessages = new List<string>();
             if (baseDto == null)
@@ -18,7 +26,8 @@ namespace ToDoApp.Service.Services
                     ValidationErrors = validationMessages
                 };
             }
-            ValidationResult validationResult = validator.Invoke(baseDto);
+            //ValidationResult validationResult = validator.Invoke(baseDto);
+            ValidationResult validationResult = _validator.Validate(baseDto);
             if (validationResult.IsValid)
             {
                 return new DtoValidationResult
@@ -37,5 +46,6 @@ namespace ToDoApp.Service.Services
                 ValidationErrors = validationMessages
             };
         }
+        
     }
 }
