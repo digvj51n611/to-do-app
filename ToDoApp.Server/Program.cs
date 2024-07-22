@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using ToDoApp.Data.Entities;
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
@@ -54,8 +55,10 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services
-    .AddScoped<IUserRepo, UserRepo>()
-    .AddScoped<ITaskItemRepo, TaskItemRepo>()
+    .AddScoped<IGenericRepo<User>,IGenericRepo<User>>()
+    .AddScoped<IGenericRepo<TaskItem>,GenericRepo<TaskItem>>()
+    //.AddScoped<IUserRepo, UserRepo>()------------> Using the generic repo now
+    //.AddScoped<ITaskItemRepo, TaskItemRepo>() --->
     .AddScoped<IValidator<TaskDto>, TaskDtoValidator>()
     .AddScoped<IValidator<UserDto>, UserDtoValidator>()
     .AddScoped((provider) =>
