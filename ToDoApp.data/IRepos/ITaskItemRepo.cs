@@ -8,7 +8,7 @@ using ToDoApp.Data.Models;
 
 namespace ToDoApp.Data.IRepos
 {
-    public interface ITaskItemRepo
+    public interface ITaskItemRepo : IGenericRepo<TaskItem>
     {
         public Task<DataResponse<TaskItem>> GetTaskItemAsync(int id);
         public Task<DataResponse<List<TaskItem>>> GetTaskItemsAsync();

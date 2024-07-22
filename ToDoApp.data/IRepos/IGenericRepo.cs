@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ToDoApp.Data.Entities;
 using ToDoApp.Data.Models;
 
 namespace ToDoApp.Data.IRepos
 {
-    public interface IGenericRepo<TData> where TData : class
+    public interface IGenericRepo<TData> where TData : BaseEntity
     {
         public Task<DataResponse<TData>> GetAsync(int id);
         public Task<DataResponse<TData>> UpdateAsync(int id , Func<TData, TData> updateRecord);

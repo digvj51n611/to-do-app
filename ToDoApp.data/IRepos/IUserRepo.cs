@@ -8,7 +8,7 @@ using ToDoApp.Data.Models;
 
 namespace ToDoApp.Data.IRepos
 {
-    public interface IUserRepo
+    public interface IUserRepo : IGenericRepo<User>
     {
         public Task<DataResponse<User>> GetUserAsync(int id);
         public Task<DataResponse<List<User>>> GetUsersAsync();
