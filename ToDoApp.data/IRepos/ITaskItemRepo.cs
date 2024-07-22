@@ -10,10 +10,6 @@ namespace ToDoApp.Data.IRepos
 {
     public interface ITaskItemRepo : IGenericRepo<TaskItem>
     {
-        public Task<DataResponse<TaskItem>> GetTaskItemAsync(int id);
-        public Task<DataResponse<List<TaskItem>>> GetTaskItemsAsync();
-        public Task<DataResponse<TaskItem>> AddTaskItemAsync(TaskItem taskItem);
-        public Task<DataResponse<TaskItem>> UpdateTaskItemAsync(TaskItem taskItem);
-        public Task<DataResponse<TaskItem>> DeleteTaskItemAsync(int id);
+
     }
 }
